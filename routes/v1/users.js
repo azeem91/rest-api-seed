@@ -29,16 +29,37 @@ router.post("/register", async (req, res, next) => {
     } catch (err) {
       return res.status(400).send(err);
     }
-    else
-      return res.status(400).send('Missing params');
+  else return res.status(400).send("Missing params");
 });
 
 // get, Update or delete user by ID
-router.get("/:userId", async (req, res, next) => {
-  let user = await User.findAll({ where: { id: req.params.userId }});
-  res.send(user)
-})
-// .put()
+router
+  .get("/:userId", async (req, res, next) => {
+    let user = await User.findAll({ where: { id: req.params.userId } });
+    res.json(user);
+  })
+  .put("/:userId/username/:username", async (req, res, next) => {
+    try {
+      var result = await User.find({ where: { id: req.params.userId } });
+    } catch (err) {
+      res.status(400).send("Error can not upate record : ", err);
+    }
+    if (result) {
+      try {
+        {
+          let newUserRecord = await result.update(
+            {
+              username: req.params.username
+            },
+            { where: { id: req.params.userId } }
+          );
+          res.status(400).json(newUserRecord);
+        }
+      } catch (err) {
+        res.status(400).json("Error can not upate record : ", err);
+      }
+    } else res.status(400).json("user not found");
+  });
 // .delete()
 
 module.exports = router;
